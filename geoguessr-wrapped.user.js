@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GeoGuessr Wrapped
 // @namespace    https://github.com/lonanche/geoguessr-wrapped
-// @version      1.1.1
+// @version      1.1.2
 // @description  Fetch all 2025 games and show top 20 most played maps with image generation
 // @author       trausi
 // @match        https://www.geoguessr.com/me/activities
@@ -646,9 +646,9 @@
                 ctx.textAlign = 'center';
                 ctx.fillText((index + 1).toString(), circleX, circleY + 5);
 
-                // Map name (truncate if too long)
+                // Map name (truncate if too long) - made bigger
                 ctx.fillStyle = 'rgba(255,255,255,0.95)';
-                ctx.font = index < 3 ? 'bold 18px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' : '16px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+                ctx.font = index < 3 ? 'bold 24px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' : '22px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
                 ctx.textAlign = 'left';
 
                 let mapName = map.mapName;
@@ -660,16 +660,16 @@
                 }
                 ctx.fillText(mapName, leftMargin + 40, yPosition - 5);
 
-                // Play count
+                // Play count - slightly bigger
                 ctx.fillStyle = '#fbbf24';
-                ctx.font = 'bold 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+                ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
                 ctx.textAlign = 'right';
-                ctx.fillText(`${map.count}`, canvas.width - rightMargin, yPosition - 15);
+                ctx.fillText(`${map.count}`, canvas.width - rightMargin, yPosition - 10);
 
-                // Percentage
+                // Percentage - bigger and closer
                 ctx.fillStyle = 'rgba(255,255,255,0.6)';
-                ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-                ctx.fillText(`${percentage}%`, canvas.width - rightMargin, yPosition + 5);
+                ctx.font = '16px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+                ctx.fillText(`${percentage}%`, canvas.width - rightMargin, yPosition + 8);
 
                 yPosition += lineHeight;
             });
