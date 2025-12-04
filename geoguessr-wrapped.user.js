@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GeoGuessr Wrapped
 // @namespace    https://github.com/lonanche/geoguessr-wrapped
-// @version      1.0.0
+// @version      1.1.0
 // @description  Fetch all 2025 games and show top 20 most played maps with image generation
 // @author       trausi
 // @match        https://www.geoguessr.com/me/activities
@@ -264,6 +264,30 @@
             accent-color: #3b82f6;
         `;
 
+        const mapCountLabel = document.createElement('label');
+        mapCountLabel.style.cssText = `
+            font-size: 13px;
+            color: #6b7280;
+            font-weight: 500;
+            margin-left: 24px;
+        `;
+        mapCountLabel.textContent = 'Maps in image:';
+
+        const mapCountInput = document.createElement('input');
+        mapCountInput.type = 'number';
+        mapCountInput.className = 'map-count-input';
+        mapCountInput.value = '15';
+        mapCountInput.min = '1';
+        mapCountInput.max = '20';
+        mapCountInput.style.cssText = `
+            width: 60px;
+            padding: 4px 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 13px;
+            text-align: center;
+        `;
+
         const generateImageButton = document.createElement('button');
         generateImageButton.className = 'generate-image-button';
         generateImageButton.textContent = 'Generate Image';
@@ -283,6 +307,8 @@
 
         tableControls.appendChild(showAllLabel);
         tableControls.appendChild(showAllCheckbox);
+        tableControls.appendChild(mapCountLabel);
+        tableControls.appendChild(mapCountInput);
         tableControls.appendChild(generateImageButton);
 
         const mapsTable = document.createElement('div');
@@ -440,7 +466,8 @@
                         generateImageButton.style.opacity = '0.6';
 
                         try {
-                            const imageDataURL = await generateImageFromTop20Maps(result.allMaps, result.totalGames);
+                            const mapCount = Math.min(Math.max(parseInt(mapCountInput.value) || 15, 1), 20);
+                            const imageDataURL = await generateImageFromTopMaps(result.allMaps, result.totalGames, mapCount);
 
                             // Create download link
                             const link = document.createElement('a');
@@ -543,11 +570,15 @@
 
     setInterval(checkUrlChange, 1000);
 
-    function generateImageFromTop20Maps(mapsData, totalGames) {
+    function generateImageFromTopMaps(mapsData, totalGames, mapCount = 15) {
         return new Promise((resolve) => {
             const canvas = document.createElement('canvas');
             canvas.width = 800;
-            canvas.height = 1200;
+            // Dynamic height based on map count
+            const baseHeight = 200;
+            const lineHeight = 50;
+            const footerHeight = 80;
+            canvas.height = baseHeight + (mapCount * lineHeight) + footerHeight;
             const ctx = canvas.getContext('2d');
 
             // Set up gradient background
@@ -565,22 +596,21 @@
 
             ctx.fillStyle = '#6b7280';
             ctx.font = '18px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-            ctx.fillText('Top 20 Most Played Maps', canvas.width / 2, 90);
+            ctx.fillText(`Top ${mapCount} Most Played Maps`, canvas.width / 2, 90);
 
             // Total games stat
             ctx.fillStyle = '#3b82f6';
             ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
             ctx.fillText(`${totalGames.toLocaleString()} Games Played`, canvas.width / 2, 130);
 
-            // Draw top 20 maps
-            const top20 = mapsData.slice(0, 20);
+            // Draw selected number of maps
+            const topMaps = mapsData.slice(0, mapCount);
             let yPosition = 180;
-            const lineHeight = 50;
             const leftMargin = 60;
             const rightMargin = 60;
             const maxTextWidth = canvas.width - leftMargin - rightMargin - 100;
 
-            top20.forEach((map, index) => {
+            topMaps.forEach((map, index) => {
                 const percentage = ((map.count / totalGames) * 100).toFixed(1);
 
                 // Rank background
