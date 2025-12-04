@@ -581,28 +581,28 @@
             canvas.height = baseHeight + (mapCount * lineHeight) + footerHeight;
             const ctx = canvas.getContext('2d');
 
-            // Set up GeoGuessr-themed gradient background
+            // Set up GeoGuessr-themed gradient background (matching their purple theme)
             const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            gradient.addColorStop(0, '#2c5aa0');
-            gradient.addColorStop(0.3, '#1e4080');
-            gradient.addColorStop(1, '#1a1a2e');
+            gradient.addColorStop(0, '#171235'); // --ds-color-purple-100
+            gradient.addColorStop(0.5, '#211a4c'); // --ds-color-purple-90
+            gradient.addColorStop(1, '#10101c'); // towards black
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             // Header section with GeoGuessr branding colors
-            ctx.fillStyle = '#ffffff';
+            ctx.fillStyle = 'rgba(255,255,255,1)';
             ctx.font = 'bold 36px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText('GeoGuessr Wrapped 2025', canvas.width / 2, 60);
 
-            ctx.fillStyle = '#e0e7ff';
+            ctx.fillStyle = 'rgba(255,255,255,0.8)';
             ctx.font = '18px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
             ctx.fillText(`Top ${mapCount} Most Played Maps`, canvas.width / 2, 90);
 
             // Total games stat
             ctx.fillStyle = '#fbbf24';
             ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-            ctx.fillText(`${totalGames.toLocaleString()} Games Played`, canvas.width / 2, 130);
+            ctx.fillText(`${totalGames} Games Played`, canvas.width / 2, 130);
 
             // Draw selected number of maps
             const topMaps = mapsData.slice(0, mapCount);
@@ -614,19 +614,36 @@
             topMaps.forEach((map, index) => {
                 const percentage = ((map.count / totalGames) * 100).toFixed(1);
 
-                // Rank background with GeoGuessr theme
-                const rankColor = index === 0 ? '#fbbf24' : index === 1 ? '#c0c0c0' : index === 2 ? '#cd7f32' : 'rgba(255,255,255,0.1)';
+                // Circular rank background with GeoGuessr theme
+                const rankColor = index === 0 ? '#fbbf24' : index === 1 ? '#c0c0c0' : index === 2 ? '#cd7f32' : 'rgba(255,255,255,0.15)';
+                const circleRadius = 18;
+                const circleX = leftMargin + 10;
+                const circleY = yPosition - 12;
+
+                // Draw circular background
                 ctx.fillStyle = rankColor;
-                ctx.fillRect(leftMargin - 10, yPosition - 30, 40, 35);
+                ctx.beginPath();
+                ctx.arc(circleX, circleY, circleRadius, 0, 2 * Math.PI);
+                ctx.fill();
+
+                // Add subtle glow effect for top 3
+                if (index < 3) {
+                    ctx.shadowColor = rankColor;
+                    ctx.shadowBlur = 8;
+                    ctx.beginPath();
+                    ctx.arc(circleX, circleY, circleRadius - 2, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
 
                 // Rank number
-                ctx.fillStyle = index < 3 ? '#1a1a2e' : '#ffffff';
-                ctx.font = 'bold 16px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+                ctx.fillStyle = index < 3 ? '#171235' : 'rgba(255,255,255,0.9)';
+                ctx.font = 'bold 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText((index + 1).toString(), leftMargin + 10, yPosition - 10);
+                ctx.fillText((index + 1).toString(), circleX, circleY + 5);
 
                 // Map name (truncate if too long)
-                ctx.fillStyle = '#ffffff';
+                ctx.fillStyle = 'rgba(255,255,255,0.95)';
                 ctx.font = index < 3 ? 'bold 18px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' : '16px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
                 ctx.textAlign = 'left';
 
@@ -637,16 +654,16 @@
                     }
                     mapName += '...';
                 }
-                ctx.fillText(mapName, leftMargin + 50, yPosition - 5);
+                ctx.fillText(mapName, leftMargin + 40, yPosition - 5);
 
                 // Play count
                 ctx.fillStyle = '#fbbf24';
                 ctx.font = 'bold 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
                 ctx.textAlign = 'right';
-                ctx.fillText(`${map.count} plays`, canvas.width - rightMargin, yPosition - 15);
+                ctx.fillText(`${map.count}`, canvas.width - rightMargin, yPosition - 15);
 
                 // Percentage
-                ctx.fillStyle = '#e0e7ff';
+                ctx.fillStyle = 'rgba(255,255,255,0.6)';
                 ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
                 ctx.fillText(`${percentage}%`, canvas.width - rightMargin, yPosition + 5);
 
@@ -654,7 +671,7 @@
             });
 
             // Footer
-            ctx.fillStyle = 'rgba(224, 231, 255, 0.8)';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
             ctx.font = '14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText('Generated by GeoGuessr Wrapped Script by trausi', canvas.width / 2, canvas.height - 30);
