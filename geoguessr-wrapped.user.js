@@ -74,16 +74,20 @@
                                     gameData.mapSlug &&
                                     gameData.mapName) {
 
-                                    const mapKey = `${gameData.mapSlug}|${gameData.mapName}`;
+                                    // Use mapSlug as the unique identifier to handle renamed maps
+                                    const mapId = gameData.mapSlug;
 
-                                    if (!mapCounts[mapKey]) {
-                                        mapCounts[mapKey] = {
+                                    if (!mapCounts[mapId]) {
+                                        // First time seeing this map (from newest to oldest)
+                                        // So this is the most recent name
+                                        mapCounts[mapId] = {
                                             mapSlug: gameData.mapSlug,
                                             mapName: gameData.mapName,
                                             count: 0
                                         };
                                     }
-                                    mapCounts[mapKey].count++;
+                                    // Don't update mapName if we already have it (keep the newest name)
+                                    mapCounts[mapId].count++;
                                     totalGames++;
                                 }
                             }
